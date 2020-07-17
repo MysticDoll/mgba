@@ -74,7 +74,111 @@
 #include "feature/sqlite3/no-intro.h"
 #include <mgba-util/vfs.h>
 
+/* for controll with TCP socket */
+#include <boost/bind.hpp>
+#include <boost/asio.hpp>
+
+using boost::asio::ip::tcp;
+
 using namespace QGBA;
+
+class session
+{
+public:
+  session(boost::asio::io_service& io_service, InputController *m_inputController)
+    : socket_(io_service)
+  {
+    m_inputController_ = m_inputController;
+  }
+
+  tcp::socket& socket()
+  {
+    return socket_;
+  }
+
+  void start()
+  {
+    socket_.async_read_some(boost::asio::buffer(data_, max_length),
+        boost::bind(&session::handle_read, this,
+          boost::asio::placeholders::error,
+          boost::asio::placeholders::bytes_transferred));
+  }
+
+  void handle_read(const boost::system::error_code& error,
+      size_t bytes_transferred)
+  {
+    if (!error)
+    {
+      boost::asio::async_write(socket_,
+          boost::asio::buffer(data_, bytes_transferred),
+          boost::bind(&session::handle_write, this,
+            boost::asio::placeholders::error));
+
+      int level = std::atoi(data_);
+      m_inputController->setLuminanceLevel(level);
+    }
+    else
+    {
+      delete this;
+    }
+  }
+
+  void handle_write(const boost::system::error_code& error)
+  {
+    if (!error)
+    {
+      socket_.async_read_some(boost::asio::buffer(data_, max_length),
+          boost::bind(&session::handle_read, this,
+            boost::asio::placeholders::error,
+            boost::asio::placeholders::bytes_transferred));
+    }
+    else
+    {
+      delete this;
+    }
+  }
+
+private:
+  tcp::socket socket_;
+  enum { max_length = 1024 };
+  char data_[max_length];
+  InputController *m_inputController_
+};
+
+class server
+{
+public:
+  server(boost::asio::io_service& io_service, short port, InputController *m_inputController)
+    : io_service_(io_service),
+      acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
+  {
+    session* new_session = new session(io_service_, m_inputController);
+    acceptor_.async_accept(new_session->socket(),
+        boost::bind(&server::handle_accept, this, new_session,
+          boost::asio::placeholders::error));
+  }
+
+  void handle_accept(session* new_session,
+      const boost::system::error_code& error)
+  {
+    if (!error)
+    {
+      new_session->start();
+      new_session = new session(io_service_);
+      acceptor_.async_accept(new_session->socket(),
+          boost::bind(&server::handle_accept, this, new_session,
+            boost::asio::placeholders::error));
+    }
+    else
+    {
+      delete new_session;
+    }
+  }
+
+private:
+  boost::asio::io_service& io_service_;
+  tcp::acceptor acceptor_;
+};
 
 Window::Window(CoreManager* manager, ConfigController* config, int playerId, QWidget* parent)
 	: QMainWindow(parent)
@@ -1329,9 +1433,22 @@ void Window::setupMenu(QMenuBar* menubar) {
 		m_inputController.setLuminanceLevel(0);
 	}, "solar");
 
-	m_actions.addAction(tr("Solar level server"), "minLuminanceLevel", [this]() {
-      m_inputController.setLuminanceLevel(0);
-    }, "solar");
+	m_actions.addAction(tr("Solar level server"), "serverLuminanceLevel", [this]() {
+      try
+        {
+          boost::asio::io_service io_service;
+
+          using namespace std; // For atoi.
+          server s(io_service, 8091, &m_inputController);
+
+          io_service.run();
+        }
+      catch (std::exception& e)
+        {
+          std::cerr << e.what() << std::endl;
+        }
+      // m_inputController.setLuminanceLevel(0);
+  }, "solar");
 
 	m_actions.addSeparator("solar");
 	for (int i = 0; i <= 10; ++i) {
@@ -1339,6 +1456,8 @@ void Window::setupMenu(QMenuBar* menubar) {
 			m_inputController.setLuminanceLevel(i);
 		}, "solar");
 	}
+
+
 
 #ifdef M_CORE_GB
 	Action* gbPrint = addGameAction(tr("Game Boy Printer..."), "gbPrint", [this]() {
