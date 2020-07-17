@@ -1329,6 +1329,10 @@ void Window::setupMenu(QMenuBar* menubar) {
 		m_inputController.setLuminanceLevel(0);
 	}, "solar");
 
+	m_actions.addAction(tr("Solar level server"), "minLuminanceLevel", [this]() {
+      m_inputController.setLuminanceLevel(0);
+    }, "solar");
+
 	m_actions.addSeparator("solar");
 	for (int i = 0; i <= 10; ++i) {
 		m_actions.addAction(tr("Brightness %1").arg(QString::number(i)), QString("luminanceLevel.%1").arg(QString::number(i)), [this, i]() {

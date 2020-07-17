@@ -4041,6 +4041,11 @@ Game Boy Advance is a registered trademark of Nintendo Co., Ltd.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1304"/>
         <source>Brightness %1</source>
         <translation type="unfinished"></translation>

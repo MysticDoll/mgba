@@ -4218,6 +4218,11 @@ Game Boy Advance es una marca registrada de Nintendo Co., Ltd.</translation>
         <translation>Más oscuro</translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1302"/>
         <source>Brightness %1</source>
         <translation>Brillo %1</translation>

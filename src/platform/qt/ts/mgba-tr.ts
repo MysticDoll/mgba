@@ -3766,6 +3766,11 @@ Game Boy Advance, Nintendo Co., Ltd.&apos;nin tescilli ticari markasıdır.</tra
         <translation>En karanlık solar seviyesi</translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1364"/>
         <source>Brightness %1</source>
         <translation>Parlaklık:%1</translation>

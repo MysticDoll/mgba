@@ -3953,6 +3953,11 @@ Game Boy Advance ist ein eingetragenes Warenzeichen von Nintendo Co., Ltd.</tran
         <translation>Dunkelster Sonnen-Level</translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1302"/>
         <source>Brightness %1</source>
         <translation>Helligkeit %1</translation>

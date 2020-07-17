@@ -4080,6 +4080,11 @@ Game Boy Advance 是任天堂有限公司（Nintendo Co., Ltd.）的注册商标
         <translation>太阳光等级为最暗</translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1327"/>
         <source>Brightness %1</source>
         <translation>亮度 %1</translation>

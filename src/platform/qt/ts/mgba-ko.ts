@@ -3731,6 +3731,11 @@ Game Boy Advance는 Nintendo Co., Ltd.의 등록 상표입니다.</translation>
         <translation>가장 어두운 태양 수준</translation>
     </message>
     <message>
+        <location filename="../Window.cpp" line="1296"/>
+        <source>Solar level server</source>
+        <translation>Brillo servidor</translation>
+    </message>
+    <message>
         <location filename="../Window.cpp" line="1319"/>
         <source>Brightness %1</source>
         <translation>밝기 %1</translation>
