@@ -75,6 +75,7 @@
 #include <mgba-util/vfs.h>
 
 /* for controll with TCP socket */
+#include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
 
@@ -86,9 +87,9 @@ class session
 {
 public:
   session(boost::asio::io_service& io_service, InputController *m_inputController)
-    : socket_(io_service)
+    : socket_(io_service),
+      m_inputController_(m_inputController)
   {
-    m_inputController_ = m_inputController;
   }
 
   tcp::socket& socket()
@@ -115,7 +116,7 @@ public:
             boost::asio::placeholders::error));
 
       int level = std::atoi(data_);
-      m_inputController->setLuminanceLevel(level);
+      m_inputController_->setLuminanceLevel(level);
     }
     else
     {
@@ -142,7 +143,7 @@ private:
   tcp::socket socket_;
   enum { max_length = 1024 };
   char data_[max_length];
-  InputController *m_inputController_
+  InputController *m_inputController_;
 };
 
 class server
@@ -150,7 +151,8 @@ class server
 public:
   server(boost::asio::io_service& io_service, short port, InputController *m_inputController)
     : io_service_(io_service),
-      acceptor_(io_service, tcp::endpoint(tcp::v4(), port))
+      acceptor_(io_service, tcp::endpoint(tcp::v4(), port)),
+      m_inputController_(m_inputController)
   {
     session* new_session = new session(io_service_, m_inputController);
     acceptor_.async_accept(new_session->socket(),
@@ -164,7 +166,7 @@ public:
     if (!error)
     {
       new_session->start();
-      new_session = new session(io_service_);
+      new_session = new session(io_service_, m_inputController_);
       acceptor_.async_accept(new_session->socket(),
           boost::bind(&server::handle_accept, this, new_session,
             boost::asio::placeholders::error));
@@ -178,6 +180,7 @@ public:
 private:
   boost::asio::io_service& io_service_;
   tcp::acceptor acceptor_;
+  InputController *m_inputController_;
 };
 
 Window::Window(CoreManager* manager, ConfigController* config, int playerId, QWidget* parent)
@@ -1438,7 +1441,6 @@ void Window::setupMenu(QMenuBar* menubar) {
         {
           boost::asio::io_service io_service;
 
-          using namespace std; // For atoi.
           server s(io_service, 8091, &m_inputController);
 
           io_service.run();

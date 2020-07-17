@@ -1197,6 +1197,10 @@ else()
 	set(SUMMARY_ZIP OFF)
 endif()
 
+find_package(Boost REQUIRED COMPONENTS system thread)
+SET(USED_LIBS ${Boost_SYSTEM_LIBRARY} ${Boost_THREAD_LIBRARY} ${Boost_REGEX_LIBRARY})
+target_link_libraries(${BINARY_NAME} ${USED_LIBS})
+
 if(NOT QUIET AND NOT LIBMGBA_ONLY)
 	message(STATUS "Build type: ${CMAKE_BUILD_TYPE}")
 	message(STATUS "Platforms:")
